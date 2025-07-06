@@ -48,4 +48,46 @@ All communication is logged to `/tmp/prologix.log` (can be changed using the
 `log_path`-argument to the `Prologix` instance), where you can observe what data
 is sent to and received from the device.
 
+# Quick reference for instruments
 
+## Agilent E363xA
+
+Code for single output DC power supply E3633A and triple output DC power supply E3631A.
+
+```
+from prologix import Prologix
+from e363xa import E363xA, Port
+
+prlx = Prologix(...)
+dev = prlx.device(...)
+
+dc_psu = E363x(dev)
+
+# Either control all ports directly
+dc_psu.set_voltage(3, Port.P25V) # Set P25V output to 3V
+dc_psu.set_current(0.5, Port.P25V) # Set P25V output to 0.5A
+dc_psu.output_on(Port.P25V)
+
+# Or make an object for a port. Same as above, less verbose
+p25 = dc_psu.port(Port.P25V)
+p25.set_voltage(3)
+p25.set_voltage(0.5)
+p25.output_on()
+
+# Before making any measurements, synchronize by waiting until the PSU has
+# finished
+dc_psu.wait_for_complete()
+# or
+p25.wait_for_complete()
+
+# Turns off all channels
+dc_psu.turn_off()
+
+# Note:
+# It can be wise to wrap your whole program in a try-finally-statement to
+# turn off all channels at the end, even if the program errors
+try:
+    cool_measurement()
+finally:
+    dc_psu.turn_off()
+```
