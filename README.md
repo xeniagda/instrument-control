@@ -89,3 +89,21 @@ try:
 finally:
     dc_psu.turn_off()
 ```
+
+## HP3478A Multimeter
+
+```py
+from prologix import Prologix
+from hp3478a import HP3478A
+
+prlx = Prologix(...)
+dev = prlx.device(23)
+
+mm = HP3478A(dev)
+
+# Get voltage
+mm.read_V() # --> 2.6123 (volts)
+mm.read_I() # --> 2.21e-3 (amps)
+```
+
+Note the HP3478A doesn't use SCPI but some weird ass interface when communicating with it directly.
