@@ -57,9 +57,9 @@ from prologix import Prologix
 from e363xa import E363xA, Port
 
 prlx = Prologix(...)
-dev = prlx.device(...)
+dev = prlx.device(5)
 
-dc_psu = E363x(dev)
+dc_psu = E363xA(dev)
 
 # Either control all ports directly
 dc_psu.set_voltage(3, Port.P25V) # Set P25V output to 3V
