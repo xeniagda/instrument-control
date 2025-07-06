@@ -138,6 +138,16 @@ class E363xA:
         self._set_port(port)
         self.dev.send_command(f"OUTP:STAT OFF".encode())
 
+    def turn_off(self):
+        """
+            Turns off all output ports
+        """
+        for port in Port:
+            if self.variant.has_port(port):
+                # TODO: This is a little stupid cause P20V10A and P8V20A don't both need to be turned off
+                self.output_off(port)
+
+
     def set_voltage(self, voltage: float, port: Port):
         """
             Set the voltage on a channel. Note that there are no checks that the voltage is in range.
@@ -328,6 +338,8 @@ if __name__ == "__main__":
         ch.set_current(5)
         ch.wait_for_complete()
 
+        e3633a.turn_off()
+
     def test_e3631a():
 
         print("[E3631A]")
@@ -354,4 +366,7 @@ if __name__ == "__main__":
 
             e3631a.wait_for_complete()
 
-    test_e3631a()
+        e3631a.turn_off()
+
+    test_e3633a()
+    # test_e3631a()
