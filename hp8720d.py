@@ -4,9 +4,9 @@ import numpy as np
 
 # network analyzer
 class HP8720d:
-    def __init__(self, device: PrologixDevice):
+    def __init__(self, dev: PrologixDevice):
         # assert isinstance(device, PrologixDevice)
-        self.dev = device
+        self.dev = dev
 
         idn = self.dev.query(b"*IDN?")
         assert idn.startswith(b"HEWLETT PACKARD,8720D,"), f"Device seems to not be a HP8720d: {idn}"

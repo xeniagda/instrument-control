@@ -8,7 +8,7 @@ from commlog import CommLog
 
 # Prologix GPIB-Ethernet bridge communication layer
 
-TIMEOUT = 0.1
+TIMEOUT = 2
 EOT_BREAK_CHAR = 123
 
 class Prologix:
@@ -83,7 +83,7 @@ class Prologix:
                 ch = self.sock.recv(1)
             except TimeoutError as e:
                 # try to issue another ++read call
-                self.log.event("Timeouted. Issuing another ++read")
+                self.log.event("Timeouted. Issuing another ++read eoi")
                 self.sock.send(b'++read eoi\n')
                 continue
             self.log.write(data_hdr, ch)
@@ -105,39 +105,6 @@ class Prologix:
                     # reset the timeout
                     self.sock.settimeout(TIMEOUT)
 
-
-
-
-        # while True:
-        #     self.sock.send(b'++read eoi\n')
-
-        #     while True:
-        #         try:
-        #             ch = self.sock.recv(1)
-        #         except TimeoutError as e:
-        #             self.log.event("Read failure. Retrying")
-        #             time.sleep(TIMEOUT)
-        #             continue
-
-        #         self.log.write(f"Recv from {self.current_addr}", ch)
-        #         if ch[0] == EOT_BREAK_CHAR:
-        #             self.log.event("Got a null byte. Seeing if there's more data")
-
-        #             try:
-        #                 self.sock.settimeout(0.01) # short timeout
-        #                 next_ch = self.sock.recv(1)
-        #                 self.log.write(f"Recv from {self.current_addr}", next_ch)
-        #                 res += ch
-        #                 ch = next_ch
-        #             except TimeoutError as e:
-        #                 # we're done
-        #                 self.log.event("Nope. We timeouted.")
-        #                 return res
-        #             finally:
-        #                 self.sock.settimeout(TIMEOUT) # reset the timeout
-
-        #             self.log.write(f"Recv from {self.current_addr}", ch)
-        #         res += ch
 
     def device(self, addr: int) -> PrologixDevice:
         return PrologixDevice(self, addr)
