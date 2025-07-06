@@ -54,7 +54,7 @@ is sent to and received from the device.
 
 Code for single output DC power supply E3633A and triple output DC power supply E3631A.
 
-```
+```py
 from prologix import Prologix
 from e363xa import E363xA, Port
 
