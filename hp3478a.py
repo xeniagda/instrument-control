@@ -1,53 +1,51 @@
 # HP3489A Multimeter
 # Does NOT use SCPI
 
-from prologix import Prologix
+from prologix import Prologix, PrologixDevice
 import time
 
 class HP3478A:
     def __init__(
         self,
-        comm: Prologix,
-        addr: int,
+        dev: PrologixDevice,
     ):
-        self.comm = comm
-        self.addr = addr
+        self.dev = dev
 
         self.mode = None
 
         # go to autorange
-        self.comm.send_command(b"RA", self.addr)
+        self.dev.send_command(b"RA")
         # show 5+1/2 digits
-        self.comm.send_command(b"N5", self.addr)
+        self.dev.send_command(b"N5")
         # wait for trigger command
-        self.comm.send_command(b"T4", self.addr)
+        self.dev.send_command(b"T4")
 
     def show_on_display(self, text: str):
-        self.comm.send_command(b"D2" + text.encode(), self.addr)
+        self.dev.send_command(b"D2" + text.encode())
 
     def reset_display(self):
-        self.comm.send_command(b"D1", self.addr)
+        self.dev.send_command(b"D1")
 
     def _mode_DC_V(self):
         if self.mode != "DC_V":
             self.mode = "DC_V"
-            self.comm.send_command(b"F1", self.addr)
+            self.dev.send_command(b"F1")
 
     def _mode_DC_I(self):
         if self.mode != "DC_I":
             self.mode = "DC_I"
-            self.comm.send_command(b"F5", self.addr)
+            self.dev.send_command(b"F5")
 
     def _preread_V(self):
         self._mode_DC_V()
-        self.comm.send_command(b"T3", self.addr) # single trigger
+        self.dev.send_command(b"T3") # single trigger
 
     def _preread_I(self):
         self._mode_DC_I()
-        self.comm.send_command(b"T3", self.addr) # single trigger
+        self.dev.send_command(b"T3") # single trigger
 
     def _postread(self) -> float:
-        return float(self.comm.read_until_eoi(self.addr))
+        return float(self.dev.read_until_eoi())
 
     def read_V(self) -> float:
         self._preread_V()
@@ -64,10 +62,17 @@ if __name__ == "__main__":
     import time
     import tqdm
     p = Prologix("/tmp/prologix.log", "10.30.42.1", 1234)
-    m = HP3478A(p, 23)
+    m = HP3478A(p.device(23))
     m.show_on_display(":3 :3 :3 :3 :3")
     time.sleep(1)
     m.reset_display()
-    for i in tqdm.tqdm(range(30)):
-        m.read_V()
-        # print("Got voltage", m.read_V())
+
+    bar = tqdm.tqdm(range(30))
+    for i in bar:
+        V = m.read_V()
+        bar.set_description(f"V = {V:.2f} V")
+
+    bar = tqdm.tqdm(range(30))
+    for i in bar:
+        I = m.read_I()
+        bar.set_description(f"I = {I*1e6:.2f} μA")
