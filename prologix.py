@@ -14,16 +14,16 @@ EOT_BREAK_CHAR = 123
 class Prologix:
     def __init__(
         self,
-        log_path: str,
         ip: str,
         port: int = 1234,
+        log_path: Optional[str]=None,
     ):
         self.ip = ip
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip, port))
         self.current_addr = -1
-        self.log = CommLog(log_path)
+        self.log = CommLog(log_path or "/tmp/prologix.log")
         self.sock.send(b"++auto 0\n") # don't auto-receive
         self.sock.send(b"++eos 2\n") # append LF to commands
 

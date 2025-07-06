@@ -288,7 +288,7 @@ class E363xAChannel:
 
 if __name__ == "__main__":
     import time, tqdm
-    p = Prologix("/tmp/prologix.log", "10.30.42.1", 1234)
+    p = Prologix("10.30.42.1", 1234)
 
     def test_e3633a():
 

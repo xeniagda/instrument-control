@@ -61,7 +61,7 @@ class HP3478A:
 if __name__ == "__main__":
     import time
     import tqdm
-    p = Prologix("/tmp/prologix.log", "10.30.42.1", 1234)
+    p = Prologix("10.30.42.1", 1234)
     m = HP3478A(p.device(23))
     m.show_on_display(":3 :3 :3 :3 :3")
     time.sleep(1)
