@@ -4,7 +4,18 @@ import numpy as np
 
 # network analyzer
 class HP8720d:
+    """
+        HP8720d vector network analyzer
+    """
     def __init__(self, dev: PrologixDevice):
+        """
+            Create a HP8720d device
+
+            Parameters
+            ----------
+            dev: PrologixDevice
+                Device to connect to. Use Prologix.device(GBIB_ADDR) to acquire.
+        """
         # assert isinstance(device, PrologixDevice)
         self.dev = dev
 
@@ -16,6 +27,9 @@ class HP8720d:
 
     @property
     def freq_start(self):
+        """
+            Starting frequency in GHz
+        """
         return float(self.dev.query(b'STAR;OUTPACTI;'))
 
     @freq_start.setter
@@ -24,6 +38,9 @@ class HP8720d:
 
     @property
     def freq_stop(self):
+        """
+            Stopping frequency in GHz
+        """
         return float(self.dev.query(b'STOP;OUTPACTI;'))
 
     @freq_stop.setter
@@ -32,6 +49,9 @@ class HP8720d:
 
     @property
     def npoints(self):
+        """
+            Number of frequency points
+        """
         instrument_ret_val = self.dev.query(b'POIN;OUTPACTI;')
         return int(float(instrument_ret_val.decode().strip()))
 
@@ -45,7 +65,11 @@ class HP8720d:
         self.freq_start = freq.f[0]
         self.freq_stop = freq.f[-1]
 
-    def _measure_one_s(self, n, m) -> np.ndarray:
+    def measure_one_s(self, n, m) -> np.ndarray:
+        """
+            Measure the S_n,m port of the device
+            Returns a complex numpy array of S-parameters over frequency
+        """
         s_cmd = f"S{n}{m};"
         self.dev.send_command(s_cmd.encode())
         raw_data = self.dev.query(b"SING;FORM3;OUTPDATA;") # form3 = 64 bit floats
@@ -54,9 +78,13 @@ class HP8720d:
         return data
 
     def full_twoport(self) -> skrf.Network:
-        s11 = self._measure_one_s(1, 1)
-        s12 = self._measure_one_s(1, 2)
-        s21 = self._measure_one_s(2, 1)
-        s22 = self._measure_one_s(2, 2)
+        """
+            Measure the full 2x2 S matrix of the device
+            Returns the shape (n_points, 2, 2). S11 is [:,0,0], etc.
+        """
+        s11 = self.measure_one_s(1, 1)
+        s12 = self.measure_one_s(1, 2)
+        s21 = self.measure_one_s(2, 1)
+        s22 = self.measure_one_s(2, 2)
         s = np.stack([[s11, s12], [s21, s22]]).transpose(2, 0, 1)
         return skrf.Network(frequency=self.frequency, s=s)

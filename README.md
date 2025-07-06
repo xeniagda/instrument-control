@@ -107,3 +107,35 @@ mm.read_I() # --> 2.21e-3 (amps)
 ```
 
 Note the HP3478A doesn't use SCPI but some weird ass interface when communicating with it directly.
+
+## HP7820A Vector network analyzer
+
+This module interfaces with `scikit-rf`, make sure to have it install.
+
+```py
+from prologix import Prologix
+from hp8720d import HP8720d
+import skrf
+
+prlx = Prologix(...)
+dev = prlx.device(16)
+
+vna = HP8720d(dev)
+
+# Read the frequency from the vna
+print(vna.freq) # 0.05-7.0 GHz, 201 pts
+
+# Set frequency
+# Note: this kills calibration!
+vna.freq = skrf.Frequency(1, 3, 201, "GHz") # note: number of points must always be set to 201
+
+# Measure S11
+s11 = vna.measure_one_s(1, 1)
+print(s11.shape, s11.dtype) # --> (201, ) "complex"
+
+net = vna.full_twoport() # Returns a skrf.Network object with the measured data
+
+# net.s is a numpy matrix of s-parameters
+# net.s[:,0,0] is S11 for all frequency points, etc.
+print(net.s.shape) # (201, 2, 2)
+```
