@@ -52,7 +52,7 @@ class E363xA:
         dev: PrologixDevice,
     ):
         """
-            Create a E363xA device
+            Create a E363xA device. Automatically detects if it's an E3633A or E3631A.
 
             Parameters
             ----------
