@@ -50,9 +50,7 @@ is sent to and received from the device.
 
 # Quick reference for instruments
 
-## Agilent E363xA
-
-Code for single output DC power supply E3633A and triple output DC power supply E3631A.
+## Agilent E363xA single/triple output DC power supply
 
 ```py
 from prologix import Prologix
