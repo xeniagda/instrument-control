@@ -126,7 +126,7 @@ class E363xA:
         self._set_port(port)
         self.dev.send_command(f"OUTP:STAT ON".encode())
 
-    def output_off(self, port: Port=None):
+    def output_off(self, port: Port):
         """
             Disable an output
 
