@@ -5,10 +5,21 @@ from prologix import Prologix, PrologixDevice
 import time
 
 class HP3478A:
+    """
+        HP3478A multimeter. Very simple driver
+    """
     def __init__(
         self,
         dev: PrologixDevice,
     ):
+        """
+            Create a HP3478A device.
+
+            Parameters
+            ----------
+            dev: PrologixDevice
+                Device to connect to. Use Prologix.device(GBIB_ADDR) to acquire.
+        """
         self.dev = dev
 
         self.mode = None
@@ -21,9 +32,20 @@ class HP3478A:
         self.dev.send_command(b"T4")
 
     def show_on_display(self, text: str):
+        """
+            Show a message on screen. Note text is NOT escaped, meaning special characters cannot be displayed.
+
+            Parameters
+            ----------
+            text: str
+                Text to display
+        """
         self.dev.send_command(b"D2" + text.encode())
 
     def reset_display(self):
+        """
+            Clear display
+        """
         self.dev.send_command(b"D1")
 
     def _mode_DC_V(self):
@@ -48,11 +70,25 @@ class HP3478A:
         return float(self.dev.read_until_eoi())
 
     def read_V(self) -> float:
+        """
+            Reads the voltage
+
+            Return value
+            ------------
+            float: voltage in volts
+        """
         self._preread_V()
         # time.sleep(0.3)
         return self._postread()
 
     def read_I(self) -> float:
+        """
+            Reads the current
+
+            Return value
+            ------------
+            float: current in amperes
+        """
         self._preread_I()
         # time.sleep(0.3)
         return self._postread()
